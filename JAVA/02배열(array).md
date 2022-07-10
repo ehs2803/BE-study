@@ -135,5 +135,166 @@ System.arraycopy(num, 0, newNum, 0, num.lenth);
 ```
 위 코드는 num[0]에서 newNum[0]으로 num.length개의 데이터를 복사한다.
 
+# 배열 활용
+
+### 섞기(shuffle)
+```java
+class ArrayEx7 {
+	public static void main(String[] args) {
+		int[] numArr = new int[10];
+
+		for (int i=0; i < numArr.length ; i++ ) {
+             numArr[i] = i;  // 배열을 0~9의 숫자로 초기화한다.
+			System.out.print(numArr[i]);  
+		}
+		System.out.println();
+
+		for (int i=0; i < 100; i++ ) {
+			int n = (int)(Math.random() * 10);	// 0~9중의 한 값을 임의로 얻는다.
+
+			int tmp = numArr[0];
+			numArr[0] = numArr[n];
+			numArr[n] = tmp;
+		}
+
+		for (int i=0; i < numArr.length ; i++ )
+			System.out.print(numArr[i]);		
+	} // main의 끝
+}
+```
+
+### sort
+```java
+class ArrayEx10 {
+	public static void main(String[] args) {
+		int[] numArr = new int[10];
+
+		for (int i=0; i < numArr.length ; i++ ) {
+			System.out.print(numArr[i] = (int)(Math.random() * 10));
+		}
+		System.out.println();
+
+		for (int i=0; i < numArr.length-1 ; i++ ) {
+			boolean changed = false;	// 자리바꿈이 발생했는지를 체크한다.
+
+			for (int j=0; j < numArr.length-1-i ;j++) {
+				if(numArr[j] > numArr[j+1]) { // 옆의 값이 작으면 서로 바꾼다.
+					int temp = numArr[j];
+					numArr[j] = numArr[j+1];
+					numArr[j+1] = temp;
+					changed = true;	// 자리바꿈이 발생했으니 changed를 true로.
+				}
+			} // end for j
+
+			if (!changed) break;	// 자리바꿈이 없으면 반복문을 벗어난다.
+
+			for(int k=0; k<numArr.length;k++)
+				System.out.print(numArr[k]); // 정렬된 결과를 출력한다.
+			System.out.println();
+		} // end for i
+	} // main의 끝
+}
+```
+
+# String 배열
+
+
+
+```java
+String[] name = new String[3];
+```
+3개의 String 타입의 참조변수를 저장하기 위한 저장 공간이 마련되고 참조형 변수의 기본값은 null이므로 각 요소의 값은 null로 초기화 된다.
+
+|자료형|기본값|
+|---|---|
+|boolean|false|
+|char|'\u0000'|
+|byte,short,int|0|
+|long|0L|
+|float|0.0f|
+|double|0.0d or 0.0|
+|참조형변수|null|
+
+변수의 타입에 따른 기본값이다.
+
+```java
+String[] name = new String[]{"kim", "park", "yi"};
+String[] name = {"kim", "park", "yi"};
+
+String[] name = new String[2];
+name[0] = new String("kim");
+name[0] = "kim";
+```
+String 배열 초기화 방법이다.
+
+배열에 실제 객체가 아닌 객체의 주소가 저장되어 있다. 기본형 배열이 아닌 참조형 배열의 경우 배열에 저장되는 것은 객체의 주소이다.
+참조형 배열을 객체배열이라고 한다.
+
+
+```java
+class ArrayEx12 {
+	public static void main(String[] args) {
+		String[] names = {"Kim", "Park", "Yi"};
+
+		for(int i=0; i < names.length;i++) {
+			System.out.println("names["+i+"]:"+names[i]);
+		}
+
+		String tmp = names[2]; // 배열 names의 세 번째요소를 tmp에 저장
+		System.out.println("tmp:"+tmp);
+
+		names[0] = "Yu"; // 배열 names의 첫 번째 요소를 "Yu"로 변경
+
+		for(String str : names)   // 향상된 for문
+			System.out.println(str);
+	} // main
+}
+```
+
+# char 배열과 String 클래스
+
+문자열을 저장하는 String 타입의 변수는 사실 문자를 연이어 늘어놓은 문자배열인 char 배열과 같다.
+
+자바에서 char배열이 아닌 String 클래스를 이용하는 방법은 String 클래스가 char배열에 여러가지 기능을 추가해 확장한 것이기 때문이다.
+
+char배열과 String 클래스의 한 가지 중요한 차이점은, String 객체(문자열)는 읽을 수만 있을 뿐 내용을 변경할 수 없다.
+
+|메서드|설명|
+|---|-----|
+|char charAt(int index)|문자열에서 해당 위치에 있는 문자 반환|
+|int length()|문자열 길이 반환|
+|String substring(int from, int to)|문자열에 해당 범위(from~to-1)에 있는 문자열을 반환한다.|
+|boolean equals(Object obj)|문자열의 내용이 obj와 같은지 확인. 같은면 true, 틀리면 false|
+|char[] toCharArray()|문자열을 문자배열로 변환해 반환|
+
+
+```java
+char[] chArr = {'a', 'b', 'c'};
+String str = new String(chArr);  // char배열 -> String
+char[] tmp = str.toCharArray();  // String -> char 배열
+```
+
+char 배열과 String 간 변환 방법이다.
+
+# 길이가 0인 배열
+
+```java
+class ArrayEx16 {
+	public static void main(String[] args) {
+		System.out.println("¸Å°³º¯¼öÀÇ °³¼ö:"+args.length);
+
+		for(int i=0;i< args.length;i++) {
+			System.out.println("args[" + i + "] = \""+ args[i] + "\"");
+		}
+	}
+}
+```
+Scanner 클래스 외에도 화면을 통해 사용자로부터 입력을 받을 수 있다. 커맨드라인을 이용하는 방법이다.
+실행할 때 클래스 이름 뒤에 공백문자로 구분해 여러개의 문자열을 프로그램에 전달 할 수 있다.
+
+main에서 args 배열에 담기게 된다.
+
+커맨드 라인에 매개변수를 입력하지 않으면 크기가 0인 배열이 생성되어 args의 length는 0이 된다. 만일 입력된 매개변수가 없다고 해서 배열을 생성하지 않으면 참조변수 args의 값은 null이 된다. 그러나 JVM은 입력된 매개변수가 없을 때, null 대신 크기가 0인 배열을 생성해 args에 전달하도록 구현되어 있다.
+
 
 
