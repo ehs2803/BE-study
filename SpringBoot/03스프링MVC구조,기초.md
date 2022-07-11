@@ -111,9 +111,13 @@ public class SpringMemberControllerV2 {
 }
 ```
 클래스 레벨 @RequestMapping("/springmvc/v2/members")
-메서드 레벨 @RequestMapping("/new-form") /springmvc/v2/members/new-form
-메서드 레벨 @RequestMapping("/save") /springmvc/v2/members/save
-메서드 레벨 @RequestMapping /springmvc/v2/members
+
+메서드 레벨 @RequestMapping("/new-form") -> /springmvc/v2/members/new-form
+
+메서드 레벨 @RequestMapping("/save") -> /springmvc/v2/members/save
+
+메서드 레벨 @RequestMapping -> /springmvc/v2/members
+
 
 
 ```java
