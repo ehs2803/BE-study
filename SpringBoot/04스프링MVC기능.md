@@ -825,3 +825,117 @@ HTTP 메시지 컨버터를 사용하는 @RequestBody 도 컨트롤러가 필요
   
 스프링 MVC는 @RequestBody @ResponseBody가 있으면RequestResponseBodyMethodProcessor (ArgumentResolver) / HttpEntity가 있으면 HttpEntityMethodProcessor (ArgumentResolver)를 사용. 
   
+  
+# ModelAttribute 추가 기능
+  
+```java
+/**
+ * @ModelAttribute("item") Item item
+ * model.addAttribute("item", item); 자동 추가
+ */
+@PostMapping("/add")
+public String addItemV2(@ModelAttribute("item") Item item, Model model) {
+  itemRepository.save(item);
+  //model.addAttribute("item", item); //자동 추가, 생략 가능
+  return "basic/item";
+}
+```
+@ModelAttribute - Model 추가
+  
+@ModelAttribute 는 중요한 한가지 기능이 더 있는데, 바로 모델(Model)에 @ModelAttribute로 지정한 객체를 자동으로 넣어준다. 
+지금 코드를 보면 model.addAttribute("item", item) 가 주석처리되어 있어도 잘 동작한다.
+  
+모델에 데이터를 담을 때는 이름이 필요하다. 이름은 @ModelAttribute 에 지정한 name(value) 속성을 사용한다. 만약 다음과 같이 @ModelAttribute 의 이름을 다르게 지정하면 다른 이름으로 모델에 포함된다.
+  
+- @ModelAttribute("hello") Item item 이름을 hello 로 지정
+- model.addAttribute("hello", item); 모델에 hello 이름으로 저장
+  
+```java
+/**
+ * @ModelAttribute name 생략 가능
+ * model.addAttribute(item); 자동 추가, 생략 가능
+ * 생략시 model에 저장되는 name은 클래스명 첫글자만 소문자로 등록 Item -> item
+ */
+@PostMapping("/add")
+public String addItemV3(@ModelAttribute Item item) {
+  itemRepository.save(item);
+  return "basic/item";
+}
+```
+@ModelAttribute 의 이름을 생략하면 모델에 저장될 때 클래스명을 사용한다. 
+이때 클래스의 첫글자만 소문자로 변경해서 등록한다.
+  
+예) @ModelAttribute 클래스명 모델에 자동 추가되는 이름 Item -> item / HelloWorld -> helloWorld
+
+```java
+/**
+ * @ModelAttribute 자체 생략 가능
+ * model.addAttribute(item) 자동 추가
+ */
+@PostMapping("/add")
+public String addItemV4(Item item) {
+  itemRepository.save(item);
+  return "basic/item";
+}
+```
+@ModelAttribute 자체도 생략가능하다. 대상 객체는 모델에 자동 등록된다. 나머지 사항은 기존과 동일하다.
+
+  
+# 리다이렉트
+  
+스프링은 redirect:/... 으로 편리하게 리다이렉트를 지원한다.
+  
+컨트롤러에 매핑된 @PathVariable 의 값은 redirect 에도 사용 할 수 있다. ex) redirect:/basic/items/{itemId}
+{itemId}는 @PathVariable Long itemId 의 값을 그대로 사용한다.
+  
+  
+HTML Form 전송은 PUT, PATCH를 지원하지 않는다. GET, POST만 사용할 수 있다. > PUT, PATCH는 HTTP API 전송시에 사용
+  
+스프링에서 HTTP POST로 Form 요청할 때 히든 필드를 통해서 PUT, PATCH 매핑을 사용하는 방법이 있지만, HTTP 요청상 POST 요청이다.
+  
+![image](https://user-images.githubusercontent.com/65898555/178660974-47b7d8f6-fe0e-4dad-9089-a08c49d2fc2c.png)
+
+브라우저의 새로 고침은 마지막에 서버에 전송한 데이터를 다시 전송한다. 상품 등록 폼에서 데이터를 입력하고 저장을 선택하면 POST /add + 상품 데이터를 서버로 전송한다.
+이 상태에서 새로 고침을 또 선택하면 마지막에 전송한 POST /add + 상품 데이터를 서버로 다시 전송하게 된다. 그래서 내용은 같고, ID만 다른 상품 데이터가 계속 쌓이게 된다.
+  
+![image](https://user-images.githubusercontent.com/65898555/178661072-dea25ede-52a6-44ff-99e8-69e92b22e93d.png)
+
+웹 브라우저의 새로 고침은 마지막에 서버에 전송한 데이터를 다시 전송한다. 새로 고침 문제를 해결하려면 상품 저장 후에 뷰 템플릿으로 이동하는 것이 아니라, 상품 상세 화면으로
+리다이렉트를 호출해주면 된다. 웹 브라우저는 리다이렉트의 영향으로 상품 저장 후에 실제 상품 상세 화면으로 다시 이동한다. 따라서 마지막에 호출한 내용이 상품 상세 화면인 GET /items/{id} 가 되는 것이다. 이후 새로고침을 해도 상품 상세 화면으로 이동하게 되므로 새로 고침 문제를 해결할 수 있다.
+  
+이런 문제 해결 방식을 PRG Post/Redirect/Get라 한다.
+  
+"redirect:/basic/items/" + item.getId() redirect에서 +item.getId() 처럼 URL에 변수를 더해서 사용하는 것은 URL 인코딩이 안되기 때문에 위험하다.  
+RedirectAttributes를 사용
+  
+# RedirectAttributes
+  
+```java
+/**
+ * RedirectAttributes
+ */
+@PostMapping("/add")
+public String addItemV6(Item item, RedirectAttributes redirectAttributes) {
+  Item savedItem = itemRepository.save(item);
+  redirectAttributes.addAttribute("itemId", savedItem.getId());
+  redirectAttributes.addAttribute("status", true);
+  return "redirect:/basic/items/{itemId}";
+}
+```
+```html
+<div class="container">
+ <div class="py-5 text-center">
+ <h2>상품 상세</h2>
+ </div>
+ <!-- 추가 -->
+ <h2 th:if="${param.status}" th:text="'저장 완료!'"></h2>
+```
+리다이렉트 할 때 간단히 status=true 를 추가한다. 그리고 뷰 템플릿에서 이 값이 있으면, 저장되었습니다. 라는 메시지를 출력한다.
+실행해보면 다음과 같은 리다이렉트 결과가 나온다. http://localhost:8080/basic/items/3?status=true
+
+RedirectAttributes 를 사용하면 URL 인코딩도 해주고, pathVarible, 쿼리 파라미터까지 처리해준다.
+
+${param.status} : 타임리프에서 쿼리 파라미터를 편리하게 조회하는 기능으로 원래는 컨트롤러에서 모델에 직접 담고 값을 꺼내야 한다. 그런데 쿼리 파라미터는 자주 사용해서 타임리프에서 직접 지원한다.
+
+  
+  
