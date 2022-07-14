@@ -50,7 +50,14 @@ HTML을 파일로 직접 열었을 때, th:xxx 가 있어도 웹 브라우저는
 
 따라서 HTML을 파일 보기를 유지하면서 템플릿 기능도 할 수 있다.
 
+# 타임리프 베뉴얼
 
+타임리프는 크게 2가지 메뉴얼을 제공한다.
+
+기본 메뉴얼: https://www.thymeleaf.org/doc/tutorials/3.0/usingthymeleaf.html
+스프링 통합 메뉴얼: https://www.thymeleaf.org/doc/tutorials/3.0/thymeleafspring.html
+
+타임리프는 스프링 없이도 동작하지만, 스프링과 통합을 위한 다양한 기능을 편리하게 제공한다.
 
 # 기초
 
