@@ -937,5 +937,16 @@ RedirectAttributes 를 사용하면 URL 인코딩도 해주고, pathVarible, 쿼
 
 ${param.status} : 타임리프에서 쿼리 파라미터를 편리하게 조회하는 기능으로 원래는 컨트롤러에서 모델에 직접 담고 값을 꺼내야 한다. 그런데 쿼리 파라미터는 자주 사용해서 타임리프에서 직접 지원한다.
 
+# @ModelAttribute의 특별한 사용법
   
-  
+```java
+@ModelAttribute("regions")
+public Map<String, String> regions() {
+ Map<String, String> regions = new LinkedHashMap<>();
+ regions.put("SEOUL", "서울");
+ regions.put("BUSAN", "부산");
+ regions.put("JEJU", "제주");
+ return regions;
+}
+```
+@ModelAttribute는 컨트롤러에 있는 별도의 메서드에 적용할 수 있다. 이렇게하면 해당 컨트롤러를 요청할 때 regions 에서 반환한 값이 자동으로 모델( model )에 담기게 된다.
