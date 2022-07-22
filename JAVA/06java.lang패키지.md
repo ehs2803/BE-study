@@ -291,6 +291,13 @@ jdk1.5부터 공변 반환타입(covariant return type)이라는 것이 추가�
 위 예제에서 clone의 반환타입을 Object에서 Point로 변경한 것이다. 즉, 조상의 타입에서 자손의 타입으로 변경한 것이다. 그리고 return문에 Point타입으로 형변환도 추가했다. 예전에는 오버라이딩할 때 조상에 선언된 메서드의 반환타입을 그대로 사용해야 했다.
 
 ```java
+Point copy = (Point)original.clone();
+
+Point copy = original.clone();
+```
+위 코드처럼 공변 반환타입을 사용하면 조상의 타입이 아닌, 실제로 반환되는 자손객체의 타입으로 반환할 수 있어서 번거로운 형변환을 줄어든다는 장점이 있다.
+
+```java
 import java.util.*;
 
 class CloneEx2 {
@@ -306,3 +313,155 @@ class CloneEx2 {
 	}
 }
 ```
+배열도 객체이기 때문에 Object클래스를 상속받으며, 동시에 Cloneable인터페이스와 Serializable인터페이스가 구현되어 있다. 그래서 Object클래스의 멤버들을 모두 상속받는다.
+
+Object클래스에는 protected로 정의되어있는 clone을 배열에서 public으로 오버라이딩해서 직접 호출이 가능하다. 원본과 같은 타입을 반환하므로 형변환이 필요없다.
+
+배열뿐 아니라 java.util패키지의 Vector, ArrayList, LinkedList, HashSet, TreeSet, HashMap, TreeMap, Calendar, Date와 같은 클래스들이 이와 같은 방식으로 복제가 가능하다.
+
+### 얕은 복사와 깊은 복사
+
+clone은 단순히 객체에 저장된 값을 그대로 복제할 뿐, 객체가 참조하고 있는 객체까지 복제하지 않는다.
+
+바로 위 예제에서 기본형 배열의 경우에는 아무런 문제가 없지만, 객체배열을 clone으로 복제하는 경우에는 원본과 복제복이 같은 객체를 공유하므로 완전한 복제라고 보기 어렵다.
+
+이러한 복제를 얕은 복사(shallow copy)라고 한다. 얕은 복사에서는 원본을 변경하면 복사본도 영향을 받는다.
+
+반면에 원본이 참조하고 있는 객체까지 복제하는 것을 깊은 복사(deep copy)라고 한다. 깊은 복사에서는 원본과 복사본이 서로 다른 객체를 참조하기 때문에 원본의 변경이 복사본에 영향을 미치지 않는다.
+
+
+```java
+import java.util.*;
+
+class Circle implements Cloneable {
+	Point p;  // 원점
+	double r; // 반지름
+
+	Circle(Point p, double r) {
+		this.p = p;
+		this.r = r;
+	}
+
+	public Circle shallowCopy() { // 얕은 복사
+		Object obj = null;
+
+		try {
+			obj = super.clone();
+		} catch (CloneNotSupportedException e) {}
+
+		return (Circle)obj;
+	}
+
+	public Circle deepCopy() { // 깊은 복사
+		Object obj = null;
+
+		try {
+			obj = super.clone();
+		} catch (CloneNotSupportedException e) {}
+
+		Circle c = (Circle)obj; 
+		c.p = new Point(this.p.x, this.p.y); 
+
+		return c;
+	}
+
+	public String toString() {
+		return "[p=" + p + ", r="+ r +"]";
+	}
+}
+
+class Point {
+	int x;
+	int y;
+
+	Point(int x, int y) {
+		this.x = x;
+		this.y = y;
+	}
+
+	public String toString() {
+		return "("+x +", "+y+")";
+	}
+}
+
+class ShallowCopy {
+	public static void main(String[] args) {
+		Circle c1 = new Circle(new Point(1, 1), 2.0);
+		Circle c2 = c1.shallowCopy();
+		Circle c3 = c1.deepCopy();
+	
+		System.out.println("c1="+c1);
+		System.out.println("c2="+c2);
+		System.out.println("c3="+c3);
+		c1.p.x = 9;
+		c1.p.y = 9;
+		System.out.println("= c1의 변경 후 =");
+		System.out.println("c1="+c1);
+		System.out.println("c2="+c2);
+		System.out.println("c3="+c3);
+	}
+}
+```
+```
+c1=[p=(1, 1), r=2.0]
+c2=[p=(1, 1), r=2.0]
+c3=[p=(1, 1), r=2.0]
+= c1의 변경 후 =
+c1=[p=(9, 9), r=2.0]
+c2=[p=(9, 9), r=2.0]
+c3=[p=(1, 1), r=2.0]
+```
+
+### getClass()
+
+자신이 속한 클래스의 class 객체를 반환하는 메서드이다. Class객체는 클래스의 모든 정보를 담고 있으며, 클래스 당 1개만 존재한다. 그리고 클래스 파일이 클래스 로더에 의해서 메모리에 올라갈 때, 자동으로 생성된다. 클래스로더는 실행 시에 필요한 클래스를 동적으로 메모리에 로드하는 역할을 한다.
+
+먼저 기존에 생성된 클래스 객체가 메모리에 존재하는지 확인하고, 있으면 객체의 참조를 반환하고 없으면 클래스 패스에 지정된 경로를 따라서 클래스 파일을 찾는다.
+못 찾으면 ClassNotFoundException이 발생하고, 찾으면 해당 클래스 파일을 읽어서 Class객체로 변환한다.
+
+파일형태로 저장되어 있는 클래스를 읽어 Class클래스에 정의된 형식으로 변환하는 것이다. 즉, 클래스 파일을 읽어서 사용하기 편한 형태로 저장해 놓은 것이 클래스 객체이다.
+
+```java
+Class obj = new Card().getClass(); // 생성된 객체로 부터 얻는 방법
+Class obj = Card.class; // 클래스 리터럴로부터 얻는 방법
+Class obj = Class.forName("Card"); // 클래스 이름으로 부터 얻는 방법
+```
+forName은 특정 클래스 파일. 예를 들어 데이터베이스 드라이버를 메모리에 올릴때 주로 사용한다.
+
+```java
+final class Card {
+	String kind;
+	int num;
+
+	Card() {
+		this("SPADE", 1);
+	}
+
+	Card(String kind, int num) {
+		this.kind = kind;
+		this.num  = num;
+	}
+
+	public String toString() {
+		return kind + ":" + num;
+	}
+}
+
+class ClassEx1 {
+	public static void main(String[] args) throws Exception {
+		Card c  = new Card("HEART", 3);       // new연산자로 객체 생성
+		Card c2 = Card.class.newInstance();   // Class객체를 통해서 객체 생성
+
+		Class cObj = c.getClass();
+
+		System.out.println(c);
+		System.out.println(c2);
+		System.out.println(cObj.getName());
+		System.out.println(cObj.toGenericString());
+		System.out.println(cObj.toString());		
+	}
+}
+```
+Class 객체를 이용하면 클래스에 정의된 멤버의 이름이나 개수 등 클래스에 대한 모든 정보를 얻을 수 있기 때문에 Class객체를 통해서 객체를 생성하고 메서드를 호출하는 등 보다 동적인 코드를 작성할 수 있다.
+
+
