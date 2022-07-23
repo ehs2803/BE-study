@@ -1,0 +1,140 @@
+# Math 클래스
+
+### Math 클래스의 메서드
+
+
+### Math 클래스 예제
+
+Math 클래스는 기본적인 수학계산에 유용한 메서드로 구성되어 있다.
+
+Math 클래스의 생성자는 접근 제어자가 private이므로 다른 클래스에서 Math인스턴스를 생성할 수 없더록 되어있다. 그 이유는 클래스 내에 인스턴스변수가 하나도 없이서 인스턴스를 생성할 필요가 없기 때문이다.
+
+```java
+public static final double E = 2.7182818284590452354; // 자연로그의 밑
+public static final double PI = 3.14159265358979323846; // 원주율
+```
+또 Maht 클래스의 메서드는 모두 static이며 상수는 2개가 있다.
+
+
+```java
+import static java.lang.Math.*;
+import static java.lang.System.*;
+
+class MathEx1 {
+	public static void main(String args[]) {
+		double val = 90.7552;
+		out.println("round("+ val +")=" + round(val));  // 반올림
+
+		val *= 100;
+		out.println("round("+ val +")=" + round(val));  // 반올림
+
+		out.println("round("+ val +")/100  =" + round(val)/100);  // 반올림
+		out.println("round("+ val +")/100.0=" + round(val)/100.0);  // 반올림
+		out.println();
+		out.printf("ceil(%3.1f)=%3.1f%n",  1.1, ceil(1.1));   // 올림
+		out.printf("floor(%3.1f)=%3.1f%n", 1.5, floor(1.5));  // 버림	
+		out.printf("round(%3.1f)=%d%n",    1.1, round(1.1));  // 반올림
+		out.printf("round(%3.1f)=%d%n",    1.5, round(1.5));  // 반올림
+		out.printf("rint(%3.1f)=%f%n",     1.5, rint(1.5));   // 반올림
+		out.printf("round(%3.1f)=%d%n",   -1.5, round(-1.5)); // 반올림
+		out.printf("rint(%3.1f)=%f%n",    -1.5, rint(-1.5));  // 반올림
+		out.printf("ceil(%3.1f)=%f%n",    -1.5, ceil(-1.5));  // 올림
+		out.printf("floor(%3.1f)=%f%n",   -1.5, floor(-1.5)); // 버림
+	}
+}
+```
+```
+round(90.7552) = 91
+round(9075.52) = 9076
+round(9075.52) / 100 = 90
+round(9075.52) / 100.0 = 90.76
+
+ceil(1.1) = 2.0
+floor(1.5) 1.0
+round(1.1) = 1
+round(1.5) = 2
+rint(1.5) = 2.000000
+round(-1.5) = -1
+rint(-1.5) = -2.000000
+ceil(-1.5) = -1.000000
+floor(-1.5) = -2.000000
+```
+올림, 버림, 반올림 함수이다.
+
+
+
+```java
+import static java.lang.Math.*;
+import static java.lang.System.*;
+
+class MathEx2 {
+	public static void main(String args[]) {
+		int i = Integer.MIN_VALUE;
+
+		out.println("i ="+i);
+		out.println("-i="+(-i));
+
+		try {
+			out.printf("negateExact(%d)= %d%n",  10, negateExact(10));
+			out.printf("negateExact(%d)= %d%n", -10, negateExact(-10));
+
+			out.printf("negateExact(%d)= %d%n", i, negateExact(i)); // 예외발생
+		} catch(ArithmeticException e) {
+			// i를 long타입으로 형변환 다음에 negateExact(long a)를 호출
+		     out.printf("negateExact(%d)= %d%n",(long)i,negateExact((long)i));
+		}
+	} // main의 끝
+}
+```
+jdk1.8부터 메서드 이름에 Exact가 포함된 메서드들이 추가되었다. 이들은 정수형간의 연산에서 발생할 수 있는 오버플로우를 감지하기 위한 것이다.
+
+연산자는 단지 결과를 반환할 뿐, 오버플로우의 발생여부에 대해 알려주지 않는다. 그러나 위의 메서드들을 오버플로우가 발새하면, 예외(ArithmeticException)를 발생시킨다.
+
+
+
+```java
+import static java.lang.Math.*;
+import static java.lang.System.*;
+
+class MathEx3 {
+	public static void main(String args[]) {
+		int x1=1, y1=1;  // (1, 1)
+		int x2=2, y2=2;  // (2, 2)
+
+		double c = sqrt(pow(x2-x1, 2) + pow(y2-y1, 2));
+		double a = c * sin(PI/4);  // PI/4 rad = 45 degree
+		double b = c * cos(PI/4);
+//		double b = c * cos(toRadians(45));
+
+		out.printf("a=%f%n", a);   
+		out.printf("b=%f%n", b);  
+		out.printf("c=%f%n", c);  
+		out.printf("angle=%f rad%n", atan2(a,b));	
+		out.printf("angle=%f degree%n%n", atan2(a,b) * 180 / PI);	
+//		out.printf("angle=%f degree%n%n", toDegrees(atan2(a,b)));	
+
+		out.printf("24 * log10(2)=%f%n",   24 * log10(2));  // 7.224720
+		out.printf("53 * log10(2)=%f%n%n", 53 * log10(2));  // 15.954590
+	}
+}
+```
+삼각함수와 지수, 로그 함수이다.
+
+### StrictMath 클래스
+
+Math 클래스는 최대한의 성능을 얻기 위해 JVM이 설치된 OS의 메서드를 호출해서 사용한다. 즉, OS에 의존적인 계산을 하고 있는 것이다.
+
+예를 들어 부동소수점 계산의 경우, 반올림의 처리방법 설정이 OS마다 다를 수 있기 때문에 자바로 작성된 프로그램임에도 불구하고 컴퓨터마다 결과가 다를 수 있다
+
+이러한 차이를 없애기 위해 성능을 다소 포기하는 대신, 어떤 OS에서 실행되어도 항상 같은 결과를 얻도록 Math 클래스를 새로 작성한 것이 StrictMath클래스이다.
+
+
+
+
+
+
+
+
+
+
+
