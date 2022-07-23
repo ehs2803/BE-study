@@ -464,4 +464,346 @@ class ClassEx1 {
 ```
 Class 객체를 이용하면 클래스에 정의된 멤버의 이름이나 개수 등 클래스에 대한 모든 정보를 얻을 수 있기 때문에 Class객체를 통해서 객체를 생성하고 메서드를 호출하는 등 보다 동적인 코드를 작성할 수 있다.
 
+# String 클래스
+
+String 클래스는 변경 불가능한(immutable) 클래스이다.
+
+String 클래스에는 문자열을 저장하기 위해서 문자형 배열 참조변수(char[]) value를 인스턴스 변수로 정의해놓고 있다. 인스턴스 생성 시 생성자의 매개변수로 입력받는 문자열은 이 인스턴스 변수에 문자형 배열로 저장되는 것이다.
+
+한번 생성된 String 인스턴스가 갖고 있는 문자열은 읽어 올 수만 있고, 변경할 수는 없다.
+
+예를 들어 +연산자를 사용해 문자열을 결합하는 경우 인스턴스내의 문자열이 바뀌는 것이 아니라 새로운 문자열이 담긴 String 인스턴스가 생성되는 것이다.
+
+문자열간의 결합이나 추출 등 문자열을 다루는 작업이 많이 필요한 경우 StringBuffer클래스를 사용하는 것이 좋다. StringBuffer인스턴스에 저장된 문자열은 변경 가능하므로 하나의 StringBuffer인스턴스만으로도 문자열을 다루는 것이 가능하다.
+
+
+### 문자열 비교
+
+```java
+String str1 = "abc"; // 문자열 리터럴 지정하는 방법
+String str2 = new String("bcd"); // 새로운 String 인스턴스 생성. new 연산자에 의해서 메모리 할당
+```
+문자열 리터럴을 통해 문자열을 생성하는 것은 같은 내용의 문자열 리터럴은 한번만 저장된다. 문자열 리터럴도 String 인스턴스이고, 한번 생성하면 내용을 변경할 수 없다.
+
+```java
+class StringEx1 {
+	public static void main(String[] args) {
+		String str1 = "abc";
+		String str2 = "abc";
+
+		System.out.println("String str1 = \"abc\";");
+		System.out.println("String str2 = \"abc\";");
+
+		System.out.println("str1 == str2 ?  " + (str1 == str2));
+		System.out.println("str1.equals(str2) ? " + str1.equals(str2));
+		System.out.println();
+
+		String str3 = new String("\"abc\"");
+		String str4 = new String("\"abc\"");
+
+		System.out.println("String str3 = new String(\"abc\");");
+		System.out.println("String str4 = new String(\"abc\");");
+
+		System.out.println("str3 == str4 ? " + (str3 == str4));
+		System.out.println("str3.equals(str4) ? " + str3.equals(str4));
+	}
+}
+```
+```
+String str1 = "abc";
+String str2 = "abc";
+str == str2 ? true
+str1.equals(str2) ? true
+
+String str3 = new String("abc");
+String str4 = new String("abc");
+str3 == str4 ? false
+str3.equals(str4) ? true
+```
+
+### 빈 문자아ㅕㄹ
+
+길이가 0인 문자열이 존재가능하다. char배열도 길이가 0인 배열을 생성할 수 있다. 이 배열을 내부적으로 가지고 있는 문자열이 바로 빈 문자열이다.
+
+```String s ="";```일 때 참조변수 s가 참조하고 있는 String 인스턴스는 내부에 new char[0]과 같이 길이가 0인 char형 배열을 저장하고 있는 것이다.
+
+```java
+char c = '';//불가능
+
+char c = ' '; // 가능
+```
+
+```java
+class StringEx3 {
+	public static void main(String[] args) {
+		// 길이가 0인 char배열을 생성한다.
+		char[] cArr = new char[0];   // char[] cArr = {};와 같다.
+		String s = new String(cArr); // String s = new String("");와 같다.
+
+		System.out.println("cArr.length="+cArr.length);
+		System.out.println("@@@"+s+"@@@");
+	}
+}
+```
+```
+cArr.length=0
+@@@@@@
+```
+길이가 0인 배열을 생성해서 char형 배열 참조변수 cArr를 초기화했다. 길이가 0이긴 해도 배열이 생성되며 생성된 배열의 주소값이 참조변수 cArr에 저장된다.
+
+일반적으로 변수를 선언할 때, 각 타입의 기본값으로 초기화 하지만 String은 참조형 타입의 기본값인 null보다는 빈 문자열로, char형은 기본값인 '\u0000'대신 공백으로 초기화하는 것이 보통이다.
+
+### String 클래스의 생성자와 메서드
+
+<img width="430" alt="image" src="https://user-images.githubusercontent.com/65898555/180605744-5f44f9f0-b87e-4bdb-af2f-528202d53080.png">
+
+![image](https://user-images.githubusercontent.com/65898555/180605786-cf9170d7-29e9-42fa-9f2f-434571a01fae.png)
+
+![image](https://user-images.githubusercontent.com/65898555/180605809-6b19a662-f349-469c-820c-c77f5ac66ab6.png)
+
+![image](https://user-images.githubusercontent.com/65898555/180605827-da0186c4-aa36-46bf-aa05-4ded88a5ec4f.png)
+
+
+### join과 StringJoiner
+
+```java
+String animals = "dog,cat,bear";
+String [] arr = aniamls.split(",");
+String str = String.join("-",arr);
+System.out.println(str); // dog-cat-bear
+```
+join은 여러 문자열 사이에 구분자를 넣어서 결합한다. 구분자로 문자열을 자르는 split과 반대의 작업을 한다고 생각하면 된다.
+
+```java
+StringJoiner sj = new StringJoiner(",", "[", "]");
+String [] strArr = {"aaa","bbb","ccc"};
+
+for(String s : strArr)
+    sj.add(s.toUpperCase());
+
+System.out.println(sj.toString()); // [AAA,BBB,CCC]
+```
+java.util.StringJoiner클래스를 사용해서 문자열을 결합할 수 있다. jdk1.8부터 추가되었다.
+
+
+```java
+import java.util.StringJoiner;
+
+class StringEx4 {
+	public static void main(String[] args) {
+		String animals = "dog,cat,bear";
+		String[] arr   = animals.split(",");
+
+		System.out.println(String.join("-", arr));
+
+		StringJoiner sj = new StringJoiner("/","[","]");
+		for(String s : arr)
+			sj.add(s);
+
+		System.out.println(sj.toString());
+	}
+}
+```
+```
+dog-cat-bear
+[dog/cat/bear]
+```
+
+### 유니코드의 보충문자
+
+
+문자를 다루는 메서드에서 매개변수 타입이 char일 것도 있고 int인 것도 있다. int가 있는것은 확장된 유니코드를 다루기 위해서이다. 확장된 유니코드는 jdk1.5부터이다.
+
+유니코드는 원래 2byte 즉 16비트 문자체계인데, 이걸로도 모자라서 20비트를 확장하게 되었다. 그래서 하나의 문자를 char타입으로 다루지 못하고, int타입으로 다룰 수밖에 없다.
+
+확장에 의해 새로 추가된 문자들을 보충문자(supplementary characters)라고 한다. String 클래스의 메서드 중에서 보충 문자를 지원하는 것이 있고 지원하지 않는 것도 있다.
+이들을 구분하는 방법은 매개변수가 'int ch'인 것들은 보충문자를 지원하는 것이고 'char ch'인 것들은 지원하지 않는 것들이다. 보충문자를 사용할 일은 거의 없다.
+
+
+### 문자 인코딩 변환
+
+getBytes(String charsestName)를 사용하면, 문자열의 문자 인코딩을 다른 인코딩으로 변경할 수 있다. 자바가 UTF-16을 사용하지만, 문자열 리터럴에 포함되는 문자들은 OS의 인코딩을 사용한다. 한글 윈도우즈의 경우 문자 인코딩으로 CP949를 사용하며, UTF-8로 변경하려면
+```java
+byte[] utf8_str = "가".getBytes("UTF-8"); // 문자열을 UTF-8로 변환
+String str = new String(utf8_str, "UTF-8"); // byte배열을 문자열로 변환
+```
+
+
+```java
+import java.util.StringJoiner;
+
+class StringEx5 {
+	public static void main(String[] args) throws Exception {
+		String str = "°¡";
+
+		byte[] bArr  = str.getBytes("UTF-8");
+		byte[] bArr2 = str.getBytes("CP949");
+
+		System.out.println("UTF-8:" + joinByteArr(bArr));
+		System.out.println("CP949:" + joinByteArr(bArr2));
+
+		System.out.println("UTF-8:" + new String(bArr,  "UTF-8"));
+		System.out.println("CP949:" + new String(bArr2, "CP949"));
+	}
+
+	static String joinByteArr(byte[] bArr) {
+		 StringJoiner sj = new StringJoiner(":", "[", "]");
+
+		for(byte b : bArr)
+			sj.add(String.format("%02X",b));
+
+		return sj.toString();
+	}
+}
+```
+```
+UTF-8 : [EA:B0:80]
+CP949 : [B0:A1]
+UTF-8 : 가
+CP949 : 가
+```
+서로 다른 문자 인코딩을 사용하는 컴퓨터 간에 데이터를 주고받을 때는 적절한 문자 인코딩이 필요하다. 
+
+utf-8은 한글 한 글자를 3byte, cp949는 2byte로 표현한다.
+
+
+
+### String.format()
+
+```java
+String str = String.format("%d + %d = %d", 3,5,3+5);
+```
+format은 형식화된 문자열을 만들어내는 간단한 방법. printf와 사용법이 완전히 똑같다.
+
+### 기본형 값을 String으로, String을 기본형 값으로 변환
+
+```java
+int i=100;
+String str1 = i+""; 
+String str2 = String.valueOf(i); // 성능이 더 좋음.
+```
+기본형 값을 String으로 변환
+
+```java
+int i = Integer.parseInt("100");
+int i2 = Integer.valueOf("100");
+```
+valueOf의 반환 타입은 원래 Integer이지만 오토박싱에 의해 int로 자동 변환된다.
+
+예전에는 parseInt와 같은 메서드를 많이 사용했는데 메서드의 이름을 통일하기 위해 valueOf가 나중에 추가되었다. 
+
+valueOf는 그저 parseInt를 호출할 뿐이므로 두 메서드는 반환 타입만 다르지 같은 메서드이다.
+
+![image](https://user-images.githubusercontent.com/65898555/180606671-43d20ceb-9ff1-4523-941d-8a8d7b0c613d.png)
+
+
+```java
+int val = Integer.parseInt(" 123 ".trim());
+```
+parseInt나 parseFloat같은 메서드는 문자열에 공백 또는 문자 포함 시 예외(NumberFormatException)이 발생할 수 있어 문자열 양끝의 공백을 제거해주는 trim을 습관적으로 같이 사용하기도 한다.
+
+단 부호를 의미하는 +, 소수점을 의미하는 ., float형 값을 뜻하는 f와 같은 자료형 접미사는 허용된다. 단, 자료형에 알맞은 변환을 하는 경우에만 허용된다.
+
+### subString
+
+```java
+class StringEx7 {
+	public static void main(String[] args) {
+		String fullName = "Hello.java";
+
+		// fullName에서 '.'의 위치를 찾는다.
+		int index = fullName.indexOf('.');
+
+		// fullName의 첫번째 글자부터 '.'이 있는 곳까지 문자열을 추출한다.
+		String fileName = fullName.substring(0, index);
+
+ 	    // '.'의 다음 문자 부터 시작해서 문자열의 끝까지 추출한다.
+		// fullName.substring(index+1, fullName.length());의 결과와 같다.
+		String ext = fullName.substring(index+1);
+
+		System.out.println(fullName + "의 확장자를 제외한 이름은 " + fileName);
+		System.out.println(fullName + "의 확장자는 " + ext);
+	}
+}
+```
+substring메서드를 이용해 한 문자열에서 내용의 일부를 추출할 수 있다.
+
+substring(int start, int end)를 사용할 때 주의해야할 점은 매개변수로 사용되는 문자열에서 각 문자의 위치를 뜻하는 index가 0부터 시작한다는 것과, start부터 end의 범위 중 end위치에 있는 문자는 결과에 포함되지 않는다.
+
+# StringBuffer
+
+StringBuffer는 내부적으로 문자열 편집을 위한 버퍼를 가지고 있으며, 생성할 때 그 크기를 지정할 수 있다.
+
+이때 편집할 문자열의 길이를 고려해 버퍼의 길이를 충분히 잡아주는 것이 좋다. 편집 중인 문자열이 버퍼의 길이를 넘어서게 되면 버퍼의 길이를 늘려주는 작업이 추가로 수행되어야 하기 때문에 작업효율이 떨어진다.
+
+
+### 생성자
+
+StringBuffer클래스의 인스턴스를 생성할 때, 적절한 길이의 char형 배열이 생성되고, 이 배열은 문자열을 저장하고 편집하기 위한 공간으로 사용된다.
+
+StringBuffer인스턴스를 생성할 때 생성자 StringBuffer(int length)를 사용해서 저장될 문자열의 길이를 고려해 충분히 여유있는 크기로 지정하는 것이 좋다. 생성 시 버퍼 크기를 지정하지 않으면 16개의 문자를 저장할 수 있는 크기의 버퍼를 생성한다.
+
+### 변경
+
+```java
+StringBuffer sb = new StringBuffer("abc");
+sb.append("123");
+
+StringBuffer sb2 = sb.append("zz");
+System.out.println(sb); // abc123zz
+System.out.println(sb2); // abc123zz
+```
+append()의 반환타입이 StringBuffer인데 자신의 주소를 반환해 sb에 새로운 문자열이 추가되고 sb자신의 주소를 반환하여 sb2에는 sb의 주소가 같게된다.
+
+```java
+sb.append("123").append("zz");
+```
+append의 반환타입이 void가 아니라서 append를 연속으로 호출할 수 있다.
+
+
+### 비교
+
+StringBuffer클래스는 equals 메서드를 오버라이딩하지 않아서 StringBuffer클래스의 equlas 메서드를 사용해도 등가비교연산자(==)로 비교한 것과 같은 결과를 얻는다.
+
+반면 toString은 오버라이딩되어 있어서 담고 있는 문자열을 String으로 변환한다. 그래서 StringBuffer인스턴스에 담긴 문자열을 비교하기 위해서는 toString을 호출해서 String 인스턴스를 얻은 다음 여기에 equals메서드를 사용해서 비교해야 한다.
+
+```java
+class StringBufferEx1 {
+	public static void main(String[] args) {
+		StringBuffer sb  = new StringBuffer("abc");
+		StringBuffer sb2 = new StringBuffer("abc");
+
+		System.out.println("sb == sb2 ? " + (sb == sb2));
+		System.out.println("sb.equals(sb2) ? " + sb.equals(sb2));
+		
+		// StringBuffer의 내용을 String으로 변환한다.
+		String s  = sb.toString();	// String s = new String(sb);와 같다.
+		String s2 = sb2.toString();
+
+		System.out.println("s.equals(s2) ? " + s.equals(s2));
+	}
+}
+```
+```
+sb == sb2 ? false
+sb.equals(sb2) ? false
+s.equals(s2) ? true
+```
+
+### 메서드
+
+![image](https://user-images.githubusercontent.com/65898555/180607246-faec2e2d-fc1c-4689-9341-c0b48a9cde51.png)
+
+![image](https://user-images.githubusercontent.com/65898555/180607265-13525416-9cd9-4ee7-9175-cef11d4a22b6.png)
+
+# StringBuilder
+
+StringBuffer는 멀티쓰레드에 안전하도록 동기화되어 있다. 동기화가 StringBuffer의 성능을 떨어뜨린다.
+
+멀티쓰레드로 작성된 프로그램이 아니면, StringBuffer의 동기화는 불필요하게 성능만 떨어뜨리게 된다.
+
+그래서 StringBuffer에서 쓰레드의 동기화만 뺀 StringBuilder가 새로 추가되었다. StringBuilder는 StringBuffer와 완전히 똑같은 기능으로 작성되어 있어서, 소스코드에서 StringBuffer대신 StringBuilder를 사용하도록 바꾸면 된다.
+
+StringBuffer도 충분히 성능이 좋아 성능향상이 반드시 필요한 경우를 제외하고는 기존에 작성된 코드에서 StringBuffer를 StringBuilder로 굳이 바꿀 필요는 없다.
+
 
