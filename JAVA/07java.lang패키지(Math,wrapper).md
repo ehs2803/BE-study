@@ -2,6 +2,9 @@
 
 ### Math 클래스의 메서드
 
+![image](https://user-images.githubusercontent.com/65898555/180626417-dd2a57f9-5f97-4262-933a-a56f68541c4c.png)
+
+![image](https://user-images.githubusercontent.com/65898555/180626421-d45c33ee-c2c7-4c3f-a99b-3c5e81daaf9c.png)
 
 ### Math 클래스 예제
 
@@ -130,11 +133,51 @@ Math 클래스는 최대한의 성능을 얻기 위해 JVM이 설치된 OS의 �
 
 
 
+# 래퍼(wrapper) 클래스
+
+자바에서는 8개의 기본형을 객체로 다루지 않는데 기본형 변수도 어쩔 수 없이 객체로 다뤄야 하는 경우가 있다.
+
+이때 사용하는 것이 래퍼클래스이다. 8개의 기본형을 대표하는 8개의 래퍼클래스가 있는데, 이 클래스들을 이용하면 기본형 값을 객체로 다룰 수 있다.
+
+![image](https://user-images.githubusercontent.com/65898555/180626432-e345c0d9-a284-4d0c-8ebe-9193f8ad505a.png)
+
+래퍼 클래스의 생성자는 매개변수로 문자열이나 각 자료형의 값들을 인자로 받는다. 이때 주의할점은, 생성자의 매개변수로 문자열을 제공할 때, 각 자료형에 알맞은 문자열을 사용해야 한다.
+예를 들어 new Integer("1.0");을 하면 NumberFormatException이 발생한다.
+
+래퍼 클래스들은 모두 equals가 오버라이딩되어 있어서 주소값이 아닌 객체가 가지고 있는 값을 비교한다. 오토박싱이 된다고 해도 Integer객체에 비교연산자를 사용할 수 없다. 대신 compareTo를 제공한다.
+
+또 toString을 오버라이딩되어 있어서 객체가 가지고 있는 값을 문자열로 반환이 가능하다. 그 외에 래퍼 클래스들은 MAX_VALUE, MIN_VALUE, SIZE, BYTES, TYPE 등의 static 상수를 공통적으로 가지고 있다.
+
+### Number클래스
+
+Number 클래스는 내부적으로 숫자를 멤버변수로 갖는 래퍼 클래스들의 조상이다. 기본형 중에서 숫자와 관련된 래퍼 클래스들은 모두 Number 클래스의 자손이다.
+
+![image](https://user-images.githubusercontent.com/65898555/180626471-8157ec26-922d-490f-b8a6-08066bb49f26.png)
+
+래퍼클래스(회색)의 상속계층도이다.
+
+BigInteger와 BigDecimal 등은 각각 long으로도 다룰 수 없는 큰 범위의 정수를, double로 다룰 수 없는 큰 범위의 부동 소수점수를 처리하기 위한 것으로 연산자의 역할을 대신하는 다양한 메서드를 제공한다.
 
 
+### 문자열을 숫자로 변환
+
+![image](https://user-images.githubusercontent.com/65898555/180626526-93ddf70b-1853-4eee-84c7-ef5e77778484.png)
+
+jdk1.5부터 도입된 오토박싱(autoboxing) 기능 때문에 반환값이 기본형일 때와 래퍼클래스일 때의 차이가 없다. 그래서 그냥 valueOf를 사용해도 되지만, 성능이 조금 더 느리다.
 
 
+### 오토박싱 & 언박싱(autoboxing & unboxing)
 
+jdk1.5이전에는 기본형과 참조형 간의 연산이 불가능했지만, 컴파일러가 자동으로 변환하는 코드를 넣어주어 가능해졌다.
+
+그 외에 내부적으로 객체 배열을 가지고 있는 Vector 클래스나 ArrayList클래스에 기본형 값을 저장해야할 때나 형변환이 필요할 때도 컴파일러가 자동적으로 코드를 추가한다.
+
+```java
+ArraList<Integer> list = new ArrayList<Inteber>();
+list.add(10); // autoboxing. 10 -> new Integer(10)
+int value = list.get(0_; // unboxing. new Integer(10) -> 10
+```
+기본형 값을 래퍼 클래스의 객체로 자동변환해주는 것을 오토박싱이라하고, 그 반대로 변환하는 것을 언박싱이라고 한다.
 
 
 
