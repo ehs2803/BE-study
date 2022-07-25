@@ -206,18 +206,59 @@ rs = pstmt.executeQuery() 데이터를 변경할 때는 executeUpdate()를 사�
 
 ResultSet 내부에 있는 커서( cursor )를 이동해서 다음 데이터를 조회할 수 있다.
 
-rs.next() : 이것을 호출하면 커서가 다음으로 이동한다. 참고로 최초의 커서는 데이터를 가리키고 있지않기 때문에 rs.next() 를 최초 한번은 호출해야 데이터를 조회할 수 있다.
+rs.next() : 이것을 호출하면 커서가 다음으로 이동한다. 참고로 최초의 커서는 데이터를 가리키고 있지않기 때문에 rs.next()를 최초 한번은 호출해야 데이터를 조회할 수 있다.
 
-rs.next() 의 결과가 true 면 커서의 이동 결과 데이터가 있다는 뜻이다.
+rs.next()의 결과가 true 면 커서의 이동 결과 데이터가 있다는 뜻이다.
 
-rs.next() 의 결과가 false 면 더이상 커서가 가리키는 데이터가 없다는 뜻이다.
-rs.getString("member_id") : 현재 커서가 가리키고 있는 위치의 member_id 데이터를 String
-타입으로 반환한다.
+rs.next()의 결과가 false 면 더이상 커서가 가리키는 데이터가 없다는 뜻이다.
+
+rs.getString("member_id") : 현재 커서가 가리키고 있는 위치의 member_id 데이터를 String 타입으로 반환한다.
+
 rs.getInt("money") : 현재 커서가 가리키고 있는 위치의 money 데이터를 int 타입으로 반환한다.
 
+조회 결과가 항상 1건이므로 while 대신에 if를 사용한다.
 
 
+```java
+public void update(String memberId, int money) throws SQLException {
+  String sql = "update member set money=? where member_id=?";
+  Connection con = null;
+  PreparedStatement pstmt = null;
+  try {
+   con = getConnection();
+   pstmt = con.prepareStatement(sql);
+   pstmt.setInt(1, money);
+   pstmt.setString(2, memberId);
+   int resultSize = pstmt.executeUpdate();
+   log.info("resultSize={}", resultSize);
+  } catch (SQLException e) {
+   log.error("db error", e);
+   throw e;
+  } finally {
+   close(con, pstmt, null);
+  }
+}
 
+public void delete(String memberId) throws SQLException {
+  String sql = "delete from member where member_id=?";
+  Connection con = null;
+  PreparedStatement pstmt = null;
+  try {
+   con = getConnection();
+   pstmt = con.prepareStatement(sql);
+   pstmt.setString(1, memberId);
+   pstmt.executeUpdate();
+  } catch (SQLException e) {
+   log.error("db error", e);
+   throw e;
+  } finally {
+   close(con, pstmt, null);
+  }
+}
+```
+수정과 삭제는 등록과 비슷하다. 등록, 수정, 삭제처럼 데이터를 변경하는 쿼리는 executeUpdate()를 사용하면 된다.
+
+executeUpdate()는 쿼리를 실행하고 영향받은 row수를 반환한다.
 
 
 
