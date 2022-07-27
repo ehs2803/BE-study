@@ -495,3 +495,73 @@ JdbcUtils 편의 메서드 : 스프링은 JDBC를 편리하게 다룰 수 있는
 DriverManagerDataSource HikariDataSource로 변경해도 MemberRepositoryV1의 코드는 전혀 변경하지 않아도 된다. 
 
 MemberRepositoryV1는 DataSource인터페이스에만 의존하기 때문이다. 이것이 DataSource를 사용하는 장점이다.(DI + OCP)
+
+
+# JDBC 반복 문제 해결 - JdbcTemplate
+
+리포지토리에서 JDBC를 사용하기 때문에 발생하는 반복 문제가 있다.
+
+- 커넥션 조회, 커넥션 동기화
+- PreparedStatement 생성 및 파라미터 바인딩
+- 쿼리 실행
+- 결과 바인딩
+- 예외 발생시 스프링 예외 변환기 실행
+- 리소스 종료
+
+
+리포지토리의 각각의 메서드를 살펴보면 상당히 많은 부분이 반복된다. 이런 반복을 효과적으로 처리하는 방법이 바로 템플릿 콜백 패턴이다.
+스프링은 JDBC의 반복 문제를 해결하기 위해 JdbcTemplate이라는 템플릿을 제공한다.
+
+```java
+import hello.jdbc.domain.Member;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
+import javax.sql.DataSource;
+/**
+ * JdbcTemplate 사용
+ */
+@Slf4j
+public class MemberRepositoryV5 implements MemberRepository {
+  private final JdbcTemplate template;
+  
+  public MemberRepositoryV5(DataSource dataSource) {
+   template = new JdbcTemplate(dataSource);
+  }
+  
+  @Override
+  public Member save(Member member) {
+   String sql = "insert into member(member_id, money) values(?, ?)";
+   template.update(sql, member.getMemberId(), member.getMoney());
+   return member;
+  }
+  
+  @Override
+  public Member findById(String memberId) {
+   String sql = "select * from member where member_id = ?";
+   return template.queryForObject(sql, memberRowMapper(), memberId);
+  }
+  
+  @Override
+  public void update(String memberId, int money) {
+   String sql = "update member set money=? where member_id=?";
+   template.update(sql, money, memberId);
+  }
+  
+  @Override
+  public void delete(String memberId) {
+   String sql = "delete from member where member_id=?";
+   template.update(sql, memberId);
+  }
+  
+  private RowMapper<Member> memberRowMapper() {
+   return (rs, rowNum) -> {
+   Member member = new Member();
+   member.setMemberId(rs.getString("member_id"));
+   member.setMoney(rs.getInt("money"));
+   return member;};
+  }
+}
+```
+JdbcTemplate은 JDBC로 개발할 때 발생하는 반복을 대부분 해결해준다. 그 뿐만 아니라 트랜잭션을 위한 커넥션 동기화는 물론이고, 예외 발생시 스프링 예외 변환기도 자동으로 실행해준다.
+
